@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Logon</h1>
+{% if error %}
+    <p class=error><strong>Error:</strong>{{ error }}</p>
+{% endif %}
+<table style="width:100%">
+    <tr>
+        <th style="text-align:left">Logon</th>
+        <th></th>
+        <th style="text-align:left">Register</th>
+    </tr>
+    <tr>
+        <td>
+            <form method=post action='/logon'>
+                <dl>
+                    <dt>Username:</dt>
+                        <dd><input type="text" name=username value="{{ request.form.username }}">
+                    <dt>Password:</dt>
+                        <dd><input type=password name=password></dd>
+                </dl>
+                <p><input type=submit value=Logon></p>
+            </form>
+        </td>
+        <td style="width:20%">
+            OR
+        </td>
+        <td>
+            <form method=post action='/register'>
+                <dl>
+                    <dt>Username:</dt>
+                        <dd><input type="text" name=regusername value="{{ request.form.username }}">
+                    <dt>Password:</dt>
+                        <dd><input type=password name=regpass1></dd>
+                    <dt>Re-enter password:</dt>
+                        <dd><input type=password name=regpass2></dd>
+                </dl>
+                <p><input type=submit value=Register></p>
+        </form>
+
+        </td>
+    </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>The Gothon Game</h1>
+
+<form name=landing  method=POST action="/new_game">
+    
+    {% if not user %}
+        <h3>Welcome on Planet Percal #25!</h3>
+    {% else %}
+        <h3>Hello <em>{{user}}</em>>!</h3>
+        <h3>Welcome back on Planet Percal #25!</h3>
+    {% endif %}
+    
+    <label for="games">Please select your game:</label>
+    <select id="games" name="games">
+        {% for elem in games %}
+            <option value="{{elem['id']}}">{{elem['id']}}: {{elem.description.string}}</option>
+        {% endfor %}
+    </select>
+    <br />
+    <ul>
+        {% for elem in games %}
+            <li><em>{{elem['id']}}:</em> {{elem.description.string}}</li>
+        {% endfor %}
+    </ul>
+<input type=submit value=Submit>
+</form>
+
+
+{% endblock %}

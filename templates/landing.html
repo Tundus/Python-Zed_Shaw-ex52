@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+
+{% block content %}
+
+<h1>The Gothon Game</h1>
+{% if not user %}
+    <h3>Welcome on Planet Percal #25!</h3>
+{% else %}
+    <h3>Hello <em>{{user}}</em>! Welcome back on Planet Percal #25!</h3>
+{% endif %}
+    <pre>
+        On this site you can play the Gothon Game! 
+        Originally written by Zed A. Shaw then slightly modified by me, Andras Berecz.
+        Beside the original Game (referred to as 'Original', see <a href="{{ url_for('new_game') }}">Start New Game</a>),
+        there are a few new or modified games too. They are rather experimental but who knows,
+        maybe I will improve them in the future so please feel free to check back on my site.
+
+         
+        You can save your progress by registering <a href="{{ url_for('logon') }}">here</a>.
+        You can play without registration too but if you die you have to restart from the
+        begining.
+        
+        You can return to this page or navigate through the site by using the links at 
+        the bottom.
+        
+        Enjoy the game!
+
+
+
+    </pre>
+
+
+     
+
+{% endblock %}

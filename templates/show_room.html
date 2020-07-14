@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1> {{ room.name }}</h1>
+
+{% if user %}
+    <p>You are signed in as {{ user }}!
+{% else %}
+    <p>To save your results you must be <a href="{{ url_for('logon') }}">logged on</a>!</p>
+{% endif %}
+
+<pre>
+    {{ room.description }}
+</pre>
+{% if room.attempts < 1000 %}
+    <p>Number of attempts left: {{ room.attempts }}</p>
+{% endif %}
+
+{% if room.name in ["death", "The End"] %}
+    <p><a href="/new_game">Play again?</a></p>
+{% else %}
+    <p>
+        <form action="/game" method="POST">
+            - <input type="text" name="action">
+            <input type="submit">
+        </form>
+    </p>
+{% endif %}
+
+{% endblock %}

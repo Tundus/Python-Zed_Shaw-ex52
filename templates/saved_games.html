@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>The Gothon Game</h1>
+
+{% if user %}
+<form name=saved_games  method=POST action="/saved_games">
+    <p>Hello {{user}}! Welcome back!</p>
+    <label for="saved_games"> Please select a game to continue:</label>
+    <select id="saved_games" name="saved_games">
+        {% for k,v in data.items() %}
+            <option value="{{ k }}">{{k}} ({{v}})</option>
+        {% endfor %}
+    </select>
+    <br />
+
+<input type=submit value=Submit>
+</form>>
+{% else %}
+    <p><a href="{{ url_for('logon') }}">Please sign in</a> </p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,57 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <title>Gothons From Planet Percal #25</title>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{message}}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</head>
+
+
+
+<body>
+
+{% block content %}
+
+{% endblock %}
+</body>
+<footer>
+    <table width="30%">
+        <tr>
+            {% if user %}
+
+                <td><a href="{{ url_for('index') }}">Home</a></td>
+
+                <td><a href="{{ url_for('new_game') }}">Start New Game</a></td>
+
+                <td><a href="{{ url_for('saved_games') }}">Saved Games</a></td>
+
+                <td><a href="{{ url_for('logout') }}">Sign Out</a></td>
+
+            {% else %}
+                <td><a href="{{ url_for('index') }}">Home</a></td>
+
+                <td><a href="{{ url_for('new_game') }}">Start New Game</a></td>
+            
+                <td><a href="{{ url_for('logon') }}">Sign In/Register</a></td>
+
+            {% endif %}
+        </tr>
+    </table>
+
+       
+    
+
+</footer>
+
+
+
+
+</html>
