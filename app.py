@@ -162,8 +162,8 @@ def register():
 		pwd_blank = hashlib.sha256(''.encode('utf-8')).hexdigest()
 
 		regusr = request.form['regusername']
-		game_name = session['game_name']
-		room_name = session['room_name']
+		game_name = session.get('game_name', None)
+		room_name = session.get('room_name', None)
 		user_adat = unpickle_it('user_adat.pickle')
 		
 		if not regusr in user_adat and regusr and len(regusr)>1:
@@ -171,10 +171,10 @@ def register():
 				user_adat[regusr] = pwd1
 				pickle_it(user_adat, 'user_adat.pickle')
 				session['user'] = regusr
-				print ('registry game name', game_name)
+				
 				if game_name:
 					user_prog = unpickle_it('user_prog.pickle')
-					user_prog[regusr] = {session['game_name']:session['room_name']}
+					user_prog[regusr] = {game_name:room_name}
 					pickle_it(user_prog, 'user_prog.pickle')
 
 				flash('Your user is registered!')
