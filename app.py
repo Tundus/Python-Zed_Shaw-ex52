@@ -41,7 +41,6 @@ def index():
 
 	if request.method == 'POST':
 		user = session.get('user')
-		print ('user', user)
 		return render_template("landing.html", user=user)
 	else:
 		return render_template("landing.html")
@@ -89,8 +88,7 @@ def game():
 	room_name = session.get('room_name')
 	user = session.get('user')
 	room = game_on.load_room(room_name)
-	print ('/game, attempts', room.attempts)
-		
+			
 	if request.method == 'GET':
 
 		if room_name:
@@ -101,7 +99,6 @@ def game():
 
 	else:
 		room.attempts -= 1
-		print ('room name and attempts', (room.name, room.attempts))
 		action = request.form.get('action')
 		
 		if room_name and action:

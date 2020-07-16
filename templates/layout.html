@@ -1,8 +1,11 @@
 <html>
 
+    
+
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <title>Gothons From Planet Percal #25</title>
+    
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class=flashes>
@@ -12,16 +15,19 @@
             </ul>
         {% endif %}
     {% endwith %}
+
 </head>
 
 
 
 <body>
+    
+    {% block content %}
 
-{% block content %}
 
-{% endblock %}
+    {% endblock %}
 </body>
+
 <footer>
     <table width="30%">
         <tr>

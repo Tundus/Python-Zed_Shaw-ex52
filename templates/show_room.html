@@ -20,12 +20,21 @@
 {% if room.name in ["death", "The End"] %}
     <p><a href="/new_game">Play again?</a></p>
 {% else %}
-    <p>
+  
         <form action="/game" method="POST">
-            - <input type="text" name="action">
+            ->
+            <input type="text" name="action">
             <input type="submit">
-        </form>
-    </p>
+            
+            <div class="tooltip">
+                <img src="https://img.icons8.com/flat_round/16/000000/info.png"/>
+                <span class="tooltiptext">{{room.hint}}</span>
+                
+            </div>
+
+         </form>
+
+    
 {% endif %}
 
 {% endblock %}

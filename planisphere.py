@@ -2,6 +2,9 @@
 from bs4 import BeautifulSoup
 from pprint import pprint
 
+def attempts_exists(tag):
+	return tag.has_attr('attempts')
+
 class Room():
 
 	def __init__(self, name, description, attempts=None, hint=None):
@@ -29,7 +32,7 @@ class Game():
 	def build_rooms(self):
 		for room in self.soup.find_all("room"):
 			room_name = room['id']
-			if room['attempts'] or room.hint:
+			if room.find_all(attempts_exists) or room.hint:
 				if room['attempts'] and room.hint:
 					attempts = room['attempts']
 					hint = room.hint.string
@@ -39,7 +42,7 @@ class Game():
 					attempts = 1000
 					
 				
-			room_name = Room(room.title.string, room.description.string, attempts=attempts, hint=room.hint.string)
+			room_name = Room(room.title.string, room.description.string, attempts=attempts, hint=hint)
 			self.rooms[room['id']] = room_name
 			
 		for key, value in self.rooms.items():

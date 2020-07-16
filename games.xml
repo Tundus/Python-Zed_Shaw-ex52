@@ -23,7 +23,7 @@
                 <action input="dodge">generic_death</action>
                 <action input="tell a joke">laser_weapon_armory</action>
             </path>
-            <hint>You can shoot, dodge or fight but a joke is always loosing the atmosphere!</hint>
+            <hint>You can shoot, dodge or fight but a joke is always loosens up the atmosphere!</hint>
         </room>
         <room attempts="10" id='laser_weapon_armory'>
             <title>Laser Weapon Armory</title>
@@ -85,7 +85,7 @@
             <path>
                 <action input="2">the_end_winner</action>
             </path>
-            <hint>20% is not a bad chance at all! Think of a lottery!</hint>
+            <hint>20% is not a bad chance at all! Take lottery as an example! Not bad, innit?</hint>
         </room>
         <room attempts="1000" id='the_end_winner'>
             <title>The End</title>
