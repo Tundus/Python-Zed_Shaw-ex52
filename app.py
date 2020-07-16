@@ -84,9 +84,10 @@ def saved_games():
 	
 @app.route("/game", methods=['GET', 'POST'])
 def game():
-	game_name = session.get('game_name')
 	room_name = session.get('room_name')
 	user = session.get('user')
+	game_name = session.get('game_name')
+	load_game(game_name)
 	room = game_on.load_room(room_name)
 			
 	if request.method == 'GET':
