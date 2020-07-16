@@ -66,7 +66,7 @@ def new_game():
 def saved_games():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
-	data = user_prog.get(user)
+	data = user_prog.get(user, {'Empty': 'Nothing saved yet!'})
 
 	if request.method == 'GET':
 		return render_template("saved_games.html", user=user, data=data)
@@ -142,11 +142,8 @@ def logon():
 			return render_template("landing.html", user=user)
 
 			#return render_template("saved_games.html", data=data, user=user)
-			
-			
-			flash('Success! Your previously saved progress was loaded in! You can carry-on!')
-
-			return redirect(url_for('game'))
+			#flash('Success! Your previously saved progress was loaded in! You can carry-on!')
+			#return redirect(url_for('game'))
 	
 	return render_template('logon.html', error=error)
 
@@ -165,6 +162,8 @@ def register():
 		pwd_blank = hashlib.sha256(''.encode('utf-8')).hexdigest()
 
 		regusr = request.form['regusername']
+		game_name = session['game_name']
+		room_name = session['room_name']
 		user_adat = unpickle_it('user_adat.pickle')
 		
 		if not regusr in user_adat and regusr and len(regusr)>1:
@@ -172,9 +171,11 @@ def register():
 				user_adat[regusr] = pwd1
 				pickle_it(user_adat, 'user_adat.pickle')
 				session['user'] = regusr
-				user_prog = unpickle_it('user_prog.pickle')
-				user_prog[regusr] = {session['game_name']:session['room_name']}
-				pickle_it(user_prog, 'user_prog.pickle')
+				print ('registry game name', game_name)
+				if game_name:
+					user_prog = unpickle_it('user_prog.pickle')
+					user_prog[regusr] = {session['game_name']:session['room_name']}
+					pickle_it(user_prog, 'user_prog.pickle')
 
 				flash('Your user is registered!')
 				return redirect(url_for('logon'))
