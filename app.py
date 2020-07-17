@@ -198,6 +198,7 @@ def register():
 @app.route('/delete_user_data', methods=['GET'])
 def del_user_dat():
 	areuadmin = session.get('user')
+
 	if areuadmin == 'admin':
 		delete_user_data()
 		pickle_it({}, 'user_adat.pickle')
@@ -207,8 +208,8 @@ def del_user_dat():
 		return render_template('landing.html')
 
 	else:
-		error = 'You have to be an admin to do this'
-		return render_template('landing.html', error=error)
+		flash('You have to be an admin to do this')
+		return render_template('landing.html')
 			
 		
 if __name__ == "__main__":
