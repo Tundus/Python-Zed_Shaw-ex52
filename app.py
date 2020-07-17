@@ -41,15 +41,10 @@ def load_game(game_name):
 global games
 games = soup.find_all("game")
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['GET'])
 def index():
 	user = session.get('user')
-	
-	if request.method == 'POST':
-		return render_template("landing.html", user=user)
-
-	else:
-		return render_template("landing.html", user=user)
+	return render_template("landing.html", user=user)
 
 @app.route("/new_game", methods=['GET', 'POST'])
 def new_game():
@@ -90,9 +85,9 @@ def saved_games():
 	
 @app.route("/game", methods=['GET', 'POST'])
 def game():
-	room_name = session.get('room_name')
 	user = session.get('user')
 	game_name = session.get('game_name')
+	room_name = session.get('room_name')
 	load_game(game_name)
 	room = game_on.load_room(room_name)
 			
@@ -137,13 +132,15 @@ def logon():
 		user_prog = unpickle_it('user_prog.pickle')
 		user = request.form['username']
 		pwd_hash = hashlib.sha256(request.form['password'].encode('utf-8')).hexdigest()
+		admin_pwd_hash = 'ab13387f24af50f9835f7b089d7a4f46d74a7f053e1090db98ecdb32dbac871b'
+
 		
 		if user in user_adat and pwd_hash == user_adat.get(user) or \
-			user == 'admin' and \
-			pwd_hash == 'ab13387f24af50f9835f7b089d7a4f46d74a7f053e1090db98ecdb32dbac871b':
-			
+			user == 'admin' and pwd_hash == admin_pwd_hash:	
 			session['user'] = user
-			flash('Your are signed in as {}!'.format(user))					
+
+			flash('Your are signed in as {}!'.format(user))
+			session['user'] = user
 			return render_template("landing.html", user=user)
 
 		else:
@@ -158,7 +155,7 @@ def logon():
 @app.route("/logout")
 def logout():
 	session.pop('user', None)
-	return render_template("landing.html")
+	return render_template("landing.html", user=None)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -185,6 +182,7 @@ def register():
 					pickle_it(user_prog, 'user_prog.pickle')
 
 				flash('Your user was registered!')
+				session['user'] = regusr
 				return render_template('landing.html', user=regusr)
 
 			else:
