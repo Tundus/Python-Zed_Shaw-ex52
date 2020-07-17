@@ -2,10 +2,11 @@ from flask import Flask, session, redirect, url_for, escape, request, flash
 from flask import render_template
 from bs4 import BeautifulSoup
 import planisphere
-import os, os.path
 import hashlib
 import pickle
-from os import urandom
+import os
+from os import urandom, path
+
 
 
 app = Flask(__name__)
@@ -18,6 +19,10 @@ def pickle_it(data, file_name):
 def unpickle_it(file_name):
 	with open(file_name, 'rb') as f:
 		return pickle.load(f)
+
+def delete_user_data():
+	os.remove('user_adat.pickle')
+	os.remove('user_prog.pickle')
 
 if not os.path.isfile('user_adat.pickle'):
 	pickle_it({}, 'user_adat.pickle')
@@ -38,12 +43,13 @@ games = soup.find_all("game")
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-
+	user = session.get('user')
+	
 	if request.method == 'POST':
-		user = session.get('user')
 		return render_template("landing.html", user=user)
+
 	else:
-		return render_template("landing.html")
+		return render_template("landing.html", user=user)
 
 @app.route("/new_game", methods=['GET', 'POST'])
 def new_game():
@@ -129,17 +135,19 @@ def logon():
 	if request.method == 'POST':
 		user_adat = unpickle_it('user_adat.pickle')
 		user_prog = unpickle_it('user_prog.pickle')
+		user = request.form['username']
+		pwd_hash = hashlib.sha256(request.form['password'].encode('utf-8')).hexdigest()
 		
-		if not request.form['username'] in user_adat or \
-			hashlib.sha256(request.form['password'].encode('utf-8')).hexdigest() != \
-				user_adat.get(request.form['username']):
-			error = 'Invalid credentials!'
-		else:
-			session['user'] = request.form['username']
-			user = session.get('user')
-
+		if user in user_adat and pwd_hash == user_adat.get(user) or \
+			user == 'admin' and \
+			pwd_hash == 'ab13387f24af50f9835f7b089d7a4f46d74a7f053e1090db98ecdb32dbac871b':
+			
+			session['user'] = user
 			flash('Your are signed in as {}!'.format(user))					
 			return render_template("landing.html", user=user)
+
+		else:
+			error = 'Invalid credentials!'
 
 			#return render_template("saved_games.html", data=data, user=user)
 			#flash('Success! Your previously saved progress was loaded in! You can carry-on!')
@@ -158,7 +166,6 @@ def register():
 		
 		pwd1 = hashlib.sha256(request.form['regpass1'].encode('utf-8')).hexdigest()
 		pwd2 = hashlib.sha256(request.form['regpass2'].encode('utf-8')).hexdigest()
-		
 		pwd_blank = hashlib.sha256(''.encode('utf-8')).hexdigest()
 
 		regusr = request.form['regusername']
@@ -166,29 +173,45 @@ def register():
 		room_name = session.get('room_name', None)
 		user_adat = unpickle_it('user_adat.pickle')
 		
-		if not regusr in user_adat and regusr and len(regusr)>1:
+		if not regusr in user_adat and regusr and len(regusr)>1 and regusr != 'admin':
 			if pwd1 == pwd2 and pwd1 != pwd_blank:
 				user_adat[regusr] = pwd1
 				pickle_it(user_adat, 'user_adat.pickle')
-				session['user'] = regusr
+				
 				
 				if game_name:
 					user_prog = unpickle_it('user_prog.pickle')
 					user_prog[regusr] = {game_name:room_name}
 					pickle_it(user_prog, 'user_prog.pickle')
 
-				flash('Your user is registered!')
-				return redirect(url_for('logon'))
+				flash('Your user was registered!')
+				return render_template('landing.html', user=regusr)
+
 			else:
 				error = 'Your passwords must match and can\'t be blank!'
 		
 		else:
-			error = 'Choose a different, min 2 char long, user name!'
+			error = 'Choose a different, min 2 char long user name!'
+			return render_template('logon.html', error=error)
+
 	else:
-		return redirect(url_for('/'))
+		return render_template('logon.html', error=error)
 
-	return render_template("logon.html", error=error)
+@app.route('/delete_user_data', methods=['GET'])
+def del_user_dat():
+	areuadmin = session.get('user')
+	if areuadmin == 'admin':
+		delete_user_data()
+		pickle_it({}, 'user_adat.pickle')
+		pickle_it({}, 'user_prog.pickle')
 
+		flash('User db\'s were recreated')
+		return render_template('landing.html')
+
+	else:
+		error = 'You have to be an admin to do this'
+		return render_template('landing.html', error=error)
+			
 		
 if __name__ == "__main__":
 	app.run(debug="True")
