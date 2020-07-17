@@ -29,9 +29,9 @@
 </body>
 
 <footer>
-    <table width="30%">
+    <table width="40%">
         <tr>
-            {% if user %}
+            {% if user and user != 'admin' %}
 
                 <td><a href="{{ url_for('index') }}">Home</a></td>
 
@@ -40,6 +40,19 @@
                 <td><a href="{{ url_for('saved_games') }}">Saved Games</a></td>
 
                 <td><a href="{{ url_for('logout') }}">Sign Out</a></td>
+
+            {% elif user == 'admin' %}
+
+
+                <td><a href="{{ url_for('index') }}">Home</a></td>
+
+                <td><a href="{{ url_for('new_game') }}">Start New Game</a></td>
+
+                <td><a href="{{ url_for('saved_games') }}">Saved Games</a></td>
+
+                <td><a href="{{ url_for('logout') }}">Sign Out</a></td>
+
+                <td><a href="{{ url_for('del_user_dat') }}">Delete User Data</a></td>
 
             {% else %}
                 <td><a href="{{ url_for('index') }}">Home</a></td>
