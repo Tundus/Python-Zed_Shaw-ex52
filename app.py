@@ -88,7 +88,6 @@ def game():
 	user = session.get('user')
 	game_name = session.get('game_name')
 	room_name = session.get('room_name')
-	load_game(game_name)
 	room = game_on.load_room(room_name)
 			
 	if request.method == 'GET':
@@ -110,19 +109,22 @@ def game():
 				return render_template("you_died.html")
 			
 			elif not next_room:
-				session['room_name'] = game_on.name_room(room)
+				room_name = game_on.name_room(room)
 
 			else:
-				session['room_name'] = game_on.name_room(next_room)
+				room_name = game_on.name_room(next_room)
 				
 				if not next_room.name in ['death', 'The End'] and user:
 					user_prog = unpickle_it('user_prog.pickle')
-					user_prog[user] = {session['game_name']:game_on.name_room(next_room)}
+					user_prog[user] = {game_name:room_name}
 					pickle_it(user_prog, 'user_prog.pickle')
+
+				room = next_room
 		else:
 			return render_template("you_died.html")
-		
-		return redirect(url_for("game"))
+
+		session['room_name'] = room_name
+		return render_template("show_room.html", room=room, user=user)
 
 @app.route("/logon", methods=['GET', 'POST'])
 def logon():
@@ -181,8 +183,9 @@ def register():
 					user_prog[regusr] = {game_name:room_name}
 					pickle_it(user_prog, 'user_prog.pickle')
 
-				flash('Your user was registered!')
+
 				session['user'] = regusr
+				flash('Your user was registered!')
 				return render_template('landing.html', user=regusr)
 
 			else:
