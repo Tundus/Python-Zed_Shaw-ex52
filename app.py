@@ -200,7 +200,7 @@ def register():
 	else:
 		return render_template('logon.html', error=error)
 
-@app.route('/delete_user_data', methods=['GET'])
+@app.route("/delete_user_data", methods=['GET'])
 def del_user_dat():
 	areuadmin = session.get('user')
 
@@ -216,13 +216,13 @@ def del_user_dat():
 		flash('You have to be an admin to do this')
 		return render_template('landing.html')
 
-@app.route('/dashboard', methods=['GET'])
+@app.route("/dashboard", methods=['GET'])
 def dashboard():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
 
 	if request.method == 'GET':
-		return render_template('dashboard.html`', user=user, user_prog=user_prog)
+		return render_template('dashboard.html', user=user, user_prog=user_prog)
 
 	else:
 		pass
