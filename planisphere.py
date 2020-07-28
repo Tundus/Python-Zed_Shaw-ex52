@@ -1,6 +1,7 @@
 
 from bs4 import BeautifulSoup
 from pprint import pprint
+from random import randint
 
 def attempts_exists(tag):
 	return tag.has_attr('attempts')
@@ -50,7 +51,10 @@ class Game():
 			room = self.soup.find("room", id=key)
 
 			for action in room.path.find_all("action"):
-				value.add_path({action['input']:self.rooms.get(action.string)})
+				if 'randint' in action['input']:
+					value.add_path({eval(action['input']):self.rooms.get(action.string)})
+				else:	
+					value.add_path({action['input']:self.rooms.get(action.string)})
 		
 		self.START = self.soup.game['start']
 		

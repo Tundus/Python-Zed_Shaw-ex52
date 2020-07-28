@@ -31,6 +31,7 @@ if not os.path.isfile('user_prog.pickle'):
 	pickle_it({}, 'user_prog.pickle')
 
 with open('games.xml', 'r') as f:
+	global soup
 	soup = BeautifulSoup(f, 'lxml')
 
 def load_game(game_name):
@@ -105,15 +106,17 @@ def game():
 		if room_name and action:
 			next_room = room.go(action)
 
-			if not next_room and room.attempts == 0:
-				return render_template("you_died.html")
-			
-			elif not next_room:
-				room_name = game_on.name_room(room)
+			if not next_room:
+				if room.attempts == 0:
+					return render_template("you_died.html")
 
+				else:
+					pass
+			
 			else:
 				room_name = game_on.name_room(next_room)
-				
+				session['room_name'] = room_name
+
 				if not next_room.name in ['death', 'The End'] and user:
 					user_prog = unpickle_it('user_prog.pickle')
 					user_prog[user] = {game_name:room_name}
@@ -122,8 +125,7 @@ def game():
 				room = next_room
 		else:
 			return render_template("you_died.html")
-
-		session['room_name'] = room_name
+	
 		return render_template("show_room.html", room=room, user=user)
 
 @app.route("/logon", methods=['GET', 'POST'])
@@ -213,6 +215,17 @@ def del_user_dat():
 	else:
 		flash('You have to be an admin to do this')
 		return render_template('landing.html')
+
+@app.route('/dashboard', methods=['GET'])
+def dashboard():
+	user = session.get('user')
+	user_prog = unpickle_it('user_prog.pickle')
+
+	if request.method == 'GET':
+		return render_template('dashboard.html`', user=user, user_prog=user_prog)
+
+	else:
+		pass
 			
 		
 if __name__ == "__main__":

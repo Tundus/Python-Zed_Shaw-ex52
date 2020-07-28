@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    {% if user == 'admin' %}
+
+        <ul>
+            {% for user, game_state in user_prog %}
+                <li><em>{{ user }}:</em> {{ game_state }}</li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
+
+{% endblock %}

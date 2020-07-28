@@ -43,6 +43,7 @@
                 lock closes forever and you can't get the bomb.  The code is 3 digits.
             </description>
             <path>
+                <action input="randint(0,999)">the_bridge</action>
                 <action input="0123">the_bridge</action>
             </path>
             <hint>Your guess is as good as mine! Literally in this case!</hint>
@@ -83,7 +84,8 @@
                 have time to look. There is five pods, which one do you take?
             </description>
             <path>
-                <action input="2">the_end_winner</action>
+                <action input="randint(0,5)">the_end_winner</action>
+                <action input="9">the_end_winner</action>
             </path>
             <hint>20% is not a bad chance at all! Take lottery as an example! Not bad, innit?</hint>
         </room>
