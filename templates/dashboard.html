@@ -5,11 +5,18 @@
     {% if user == 'admin' %}
 
         <ul>
-            {% for user, game_state in user_prog %}
+            {% for user, game_state in user_prog.items() %}
                 <li><em>{{ user }}:</em> {{ game_state }}</li>
             {% endfor %}
         </ul>
 
+    {% else %}
+
+    <h3>You must sign in as an admin to get access here!</h3>
+
     {% endif %}
+    
+    <a href="{{ url_for('del_user_dat') }}">Delete all user data</a>
+    <br/>
 
 {% endblock %}
