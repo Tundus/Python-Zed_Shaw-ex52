@@ -9,6 +9,9 @@
                 <li><em>{{ user }}:</em> {{ game_state }}</li>
             {% endfor %}
         </ul>
+        <br/>
+        <a href="{{ url_for('del_user_dat') }}">Delete all user data</a>
+        <br/>
 
     {% else %}
 
@@ -16,7 +19,6 @@
 
     {% endif %}
     
-    <a href="{{ url_for('del_user_dat') }}">Delete all user data</a>
-    <br/>
+ 
 
 {% endblock %}
