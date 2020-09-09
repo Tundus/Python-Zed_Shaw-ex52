@@ -10,7 +10,7 @@ from os import urandom, path
 
 
 app = Flask(__name__)
-app.secret_key = os.urandom(16)
+app.secret_key = b'U\xe8\xcc\x82b\x83\x85t\x80\x05\x9cK\x93\xabr\xd3'
 
 def pickle_it(data, file_name):
 	with open(file_name, 'wb') as f:
@@ -33,14 +33,15 @@ if not os.path.isfile('user_prog.pickle'):
 with open('games.xml', 'r') as f:
 	global soup
 	soup = BeautifulSoup(f, 'lxml')
+	global games
+	games = soup.find_all("game")
 
 def load_game(game_name):
 	markup = soup.find("game", id=game_name)
 	global game_on
 	game_on = planisphere.Game(markup)
 
-global games
-games = soup.find_all("game")
+
 
 @app.route("/", methods=['GET'])
 def index():
@@ -144,7 +145,6 @@ def logon():
 			session['user'] = user
 
 			flash('Your are signed in as {}!'.format(user))
-			session['user'] = user
 			return render_template("landing.html", user=user)
 
 		else:
@@ -159,6 +159,8 @@ def logon():
 @app.route("/logout")
 def logout():
 	session.pop('user', None)
+	session.pop('game_name', None)
+	session.pop('room_name', None)
 	return render_template("landing.html", user=None)
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -210,7 +212,7 @@ def del_user_dat():
 		pickle_it({}, 'user_prog.pickle')
 
 		flash('User db\'s were recreated')
-		return render_template('landing.html')
+		return render_template('dashboard.html', user=areuadmin)
 
 	else:
 		flash('You have to be an admin to do this')
@@ -221,8 +223,8 @@ def dashboard():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
 
-	if request.method == 'GET':
-		return render_template('dashboard.html', user=user, user_prog=user_prog)
+	if request.method == 'GET' and user == 'admin':
+		return render_template('dashboard.html', user=user, user_prog=user_prog, randoms=game_on.rand_vals)
 
 	else:
 		pass
