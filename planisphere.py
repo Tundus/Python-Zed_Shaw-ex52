@@ -14,7 +14,7 @@ class Room():
 		self.paths = {}
 		self.attempts = int(attempts)
 		self.hint = hint
-
+		
 	def go(self, direction):
 		return self.paths.get(direction, None)
 
@@ -28,6 +28,7 @@ class Game():
 		self.soup = BeautifulSoup(str(markup), 'xml')
 		self.START = self.soup.game['start']
 		self.rooms = {}
+		self.rand_vals = {}
 		self.build_rooms()
 
 	def build_rooms(self):
@@ -52,7 +53,9 @@ class Game():
 
 			for action in room.path.find_all("action"):
 				if 'randint' in action['input']:
-					value.add_path({eval(action['input']):self.rooms.get(action.string)})
+					random_value = eval(action['input'])
+					value.add_path({random_value:self.rooms.get(action.string)})
+					self.rand_vals.update({key:random_value})
 				else:	
 					value.add_path({action['input']:self.rooms.get(action.string)})
 		

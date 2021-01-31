@@ -1,16 +1,19 @@
-from flask import Flask, session, redirect, url_for, escape, request, flash
-from flask import render_template
+from flask import Flask, session, redirect, url_for, escape, request, flash, render_template
+from flask_session import Session
 from bs4 import BeautifulSoup
 import planisphere
 import hashlib
 import pickle
+import config
 import os
 from os import urandom, path
 
 
 
 app = Flask(__name__)
-app.secret_key = b'U\xe8\xcc\x82b\x83\x85t\x80\x05\x9cK\x93\xabr\xd3'
+#app.secret_key = b'U\xe8\xcc\x82b\x83\x85t\x80\x05\x9cK\x93\xabr\xd3' #os.urandom(16)
+app.config.from_object('config.Config')
+#app.config.from_envvar('YOURAPPLICATION_SETTINGS')
 
 def pickle_it(data, file_name):
 	with open(file_name, 'wb') as f:
@@ -231,4 +234,4 @@ def dashboard():
 			
 		
 if __name__ == "__main__":
-	app.run(debug="True")
+	app.run()

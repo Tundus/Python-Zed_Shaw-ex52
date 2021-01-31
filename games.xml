@@ -84,7 +84,7 @@
                 have time to look. There is five pods, which one do you take?
             </description>
             <path>
-                <action input="randint(0,5)">the_end_winner</action>
+                <action input="randint(1,5)">the_end_winner</action>
                 <action input="9">the_end_winner</action>
             </path>
             <hint>20% is not a bad chance at all! Take lottery as an example! Not bad, innit?</hint>
@@ -92,7 +92,7 @@
         <room attempts="1000" id='the_end_winner'>
             <title>The End</title>
             <description>
-                You jump into pod 2 and hit the eject button. The pod easily slides
+                You jump into your choosen pod and hit the eject button. The pod easily slides
                 out into space heading to the planet below. As it flies to the planet,
                 you look back see your ship implode then explode like a bright star,
                 taking out the Gothon ship at the same time. You won!
