@@ -19,4 +19,4 @@ wrapt==1.11.2
 requests
 flask-session
 redis
-dotenv
+python-dotenv
