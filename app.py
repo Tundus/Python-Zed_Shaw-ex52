@@ -14,6 +14,7 @@ app = Flask(__name__)
 #app.secret_key = b'U\xe8\xcc\x82b\x83\x85t\x80\x05\x9cK\x93\xabr\xd3' #os.urandom(16)
 app.config.from_object('config.Config')
 #app.config.from_envvar('YOURAPPLICATION_SETTINGS')
+sess = Session(app)
 
 def pickle_it(data, file_name):
 	with open(file_name, 'wb') as f:
