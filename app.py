@@ -9,7 +9,6 @@ import os
 from os import urandom, path
 
 
-
 app = Flask(__name__)
 #app.secret_key = b'U\xe8\xcc\x82b\x83\x85t\x80\x05\x9cK\x93\xabr\xd3' #os.urandom(16)
 app.config.from_object('config.Config')
@@ -20,48 +19,56 @@ def pickle_it(data, file_name):
 	with open(file_name, 'wb') as f:
 		pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
+
 def unpickle_it(file_name):
 	with open(file_name, 'rb') as f:
 		return pickle.load(f)
+
 
 def delete_user_data():
 	os.remove('user_adat.pickle')
 	os.remove('user_prog.pickle')
 
+
 if not os.path.isfile('user_adat.pickle'):
 	pickle_it({}, 'user_adat.pickle')
+
 
 if not os.path.isfile('user_prog.pickle'):
 	pickle_it({}, 'user_prog.pickle')
 
-with open('games.xml', 'r') as f:
-	global soup
-	soup = BeautifulSoup(f, 'lxml')
-	global games
-	games = soup.find_all("game")
+def serve_soup():
+	with open('games.xml', 'r') as f:
+		soup = BeautifulSoup(f, 'lxml')
+		# games = soup.find_all("game")
+
+	return soup
 
 def load_game(game_name):
+	soup = serve_soup()
 	markup = soup.find("game", id=game_name)
-	global game_on
 	game_on = planisphere.Game(markup)
 
+	return game_on
 
 
 @app.route("/", methods=['GET'])
 def index():
-	user = session.get('user')
+	user = session.get('user', None)
+    
 	return render_template("landing.html", user=user)
 
 @app.route("/new_game", methods=['GET', 'POST'])
 def new_game():
-	user = session.get('user')
+	user = session.get('user', None)
+	all_games = serve_soup().find_all("game")
 
 	if request.method == 'GET':
-		return render_template("new_game.html", games=games, user=user)
+		return render_template("new_game.html", games=all_games, user=user)
 
 	else:
 		game_name = request.form['games']
-		load_game(game_name)
+		game_on = load_game(game_name)
 
 		session['game_name'] = game_name
 		session['room_name'] = game_on.START
@@ -80,7 +87,7 @@ def saved_games():
 
 	else:
 		game_name = request.form['saved_games']
-		load_game(game_name)
+		game_on = load_game(game_name)
 		room_name = data.get(game_name)
 
 		session['game_name'] = game_name
@@ -94,6 +101,7 @@ def game():
 	user = session.get('user')
 	game_name = session.get('game_name')
 	room_name = session.get('room_name')
+	game_on = load_game(game_name)
 	room = game_on.load_room(room_name)
 			
 	if request.method == 'GET':
@@ -226,6 +234,8 @@ def del_user_dat():
 def dashboard():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
+	game_name = session.get('game_name', None)
+	game_on = load_game(game_name)
 
 	if request.method == 'GET' and user == 'admin':
 		return render_template('dashboard.html', user=user, user_prog=user_prog, randoms=game_on.rand_vals)
