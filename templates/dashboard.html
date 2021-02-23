@@ -12,8 +12,9 @@
         </ul>
         {% endif %}
         <br />
-        <p>Random values in recent game:</p>
-        {% if randoms %}
+        {% if game and randoms %}
+        <p>Active game: {{ game.name }}</p>
+        <p>Random values in active game:</p>
         <ul>
             {% for room, randval in randoms.items() %}
                 <li><em>{{ room }}:</em> {{ randval }}</li>
@@ -26,7 +27,7 @@
 
     {% else %}
 
-    <h3>You must sign in as an admin to get access here!</h3>
+    <h3>You must sign in as an admin to get access to this site!</h3>
 
     {% endif %}
     

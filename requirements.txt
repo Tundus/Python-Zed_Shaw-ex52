@@ -20,3 +20,4 @@ requests
 flask-session
 redis
 python-dotenv
+pickle

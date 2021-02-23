@@ -2,18 +2,19 @@ from flask import Flask, session, redirect, url_for, escape, request, flash, ren
 from flask_session import Session
 from bs4 import BeautifulSoup
 import planisphere
+from planisphere import Room
 import hashlib
 import pickle
 import config
 import os
+from copy import deepcopy
 from os import urandom, path
 
 
 app = Flask(__name__)
-#app.secret_key = b'U\xe8\xcc\x82b\x83\x85t\x80\x05\x9cK\x93\xabr\xd3' #os.urandom(16)
 app.config.from_object('config.Config')
 #app.config.from_envvar('YOURAPPLICATION_SETTINGS')
-sess = Session(app)
+Session(app)
 
 def pickle_it(data, file_name):
 	with open(file_name, 'wb') as f:
@@ -37,41 +38,40 @@ if not os.path.isfile('user_adat.pickle'):
 if not os.path.isfile('user_prog.pickle'):
 	pickle_it({}, 'user_prog.pickle')
 
-def serve_soup():
-	with open('games.xml', 'r') as f:
+
+def set_soup(markup):
+	with open(markup, 'r') as f:
 		soup = BeautifulSoup(f, 'lxml')
-		# games = soup.find_all("game")
 
 	return soup
-
-def load_game(game_name):
-	soup = serve_soup()
-	markup = soup.find("game", id=game_name)
-	game_on = planisphere.Game(markup)
-
-	return game_on
 
 
 @app.route("/", methods=['GET'])
 def index():
-	user = session.get('user', None)
-    
+	user = session.get('user')
+	
 	return render_template("landing.html", user=user)
 
 @app.route("/new_game", methods=['GET', 'POST'])
 def new_game():
-	user = session.get('user', None)
-	all_games = serve_soup().find_all("game")
+	user = session.get('user')
+	soup = set_soup('games.xml')
+	games = soup('game')
 
 	if request.method == 'GET':
-		return render_template("new_game.html", games=all_games, user=user)
+		session.pop('rooms', None)
+		return render_template("new_game.html", games=games, user=user)
 
 	else:
 		game_name = request.form['games']
-		game_on = load_game(game_name)
-
-		session['game_name'] = game_name
-		session['room_name'] = game_on.START
+		game_node = soup.find("game", id=game_name)
+		active_game = planisphere.Game()
+		game_map = active_game.build_map(game_node) # a game_map object is a dict with id's and room objects
+		active_room = game_map.map.get(active_game.START)
+		
+		session['game_name'] = active_game.name
+		session['map'] = repr(game_map)
+		session['active_room'] = repr(active_room)
 		
 		return redirect(url_for("game"))
 
@@ -81,63 +81,70 @@ def saved_games():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
 	data = user_prog.get(user, {'Empty': 'Nothing saved yet!'})
+	with open('games.xml', 'r') as f:
+		soup = set_soup(f)
 
 	if request.method == 'GET':
 		return render_template("saved_games.html", user=user, data=data)
 
 	else:
 		game_name = request.form['saved_games']
-		game_on = load_game(game_name)
+		# game_markup = soup.find('game', id=game_name)
+		# active_game = planisphere.Game(game_markup)
 		room_name = data.get(game_name)
 
 		session['game_name'] = game_name
 		session['room_name'] = room_name
 
 		return redirect(url_for("game"))
-		
-	
+
+	return render_template("show_room.html", room=active_room, user=user)
+
 @app.route("/game", methods=['GET', 'POST'])
 def game():
 	user = session.get('user')
-	game_name = session.get('game_name')
-	room_name = session.get('room_name')
-	game_on = load_game(game_name)
-	room = game_on.load_room(room_name)
-			
+	map = eval(session.get('map'))
+	room = eval(session.get('active_room'))
+
 	if request.method == 'GET':
 
-		if room_name:
+		if room:
 			return render_template("show_room.html", room=room, user=user)
 
 		else:
 			return render_template("you_died.html")
 
 	else:
-		room.attempts -= 1
 		action = request.form.get('action')
 		
-		if room_name and action:
+		if room.name and action:
 			next_room = room.go(action)
 
 			if not next_room:
+				
+				room.attempts -= 1
 				if room.attempts == 0:
-					return render_template("you_died.html")
+					return render_template("you_died.html", reason='for good')
 
 				else:
-					pass
-			
-			else:
-				room_name = game_on.name_room(next_room)
-				session['room_name'] = room_name
+					session['active_room'] = repr(room)
+					return render_template("show_room.html", room=room, user=user)
 
-				if not next_room.name in ['death', 'The End'] and user:
+			else:
+				room = eval(map.get(next_room))
+				if not room.name in ['death', 'The End'] and user:
+					game_name = session.get('game_name')
 					user_prog = unpickle_it('user_prog.pickle')
-					user_prog[user] = {game_name:room_name}
+					user_prog[user] = {game_name: next_room}
 					pickle_it(user_prog, 'user_prog.pickle')
 
-				room = next_room
+				session['active_room'] = repr(room)
+				
+
+
+				
 		else:
-			return render_template("you_died.html")
+			return render_template("you_died.html", reason='technical')
 	
 		return render_template("show_room.html", room=room, user=user)
 
@@ -234,15 +241,21 @@ def del_user_dat():
 def dashboard():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
-	game_name = session.get('game_name', None)
-	game_on = load_game(game_name)
+	active_game = pickle.loads(session.get('active_game'))
+	active_room = session.get('active_room')
 
-	if request.method == 'GET' and user == 'admin':
-		return render_template('dashboard.html', user=user, user_prog=user_prog, randoms=game_on.rand_vals)
+	if active_game:
+		randoms = active_game.rand_vals
 
 	else:
-		pass
-			
+		randoms = None
+
+	if request.method == 'GET' and user == 'admin':
+		return render_template('dashboard.html', user=user, user_prog=user_prog,\
+								 game=active_game, randoms=randoms, room=active_room)
+
+	else:
+		pass			
 		
 if __name__ == "__main__":
 	app.run()
