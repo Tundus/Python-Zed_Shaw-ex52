@@ -31,44 +31,20 @@ class Room():
 
 class Game():
 
-	def __init__(self):
-		self.map = Map()
-		self.rand_vals = {}
-
-	def build_map(self, markup):
-		self.soup = BeautifulSoup(str(markup), 'lxml')
-		self.name = self.soup.game['id']
-		self.START = self.soup.game['start']
-		
-		for r in self.soup.find_all("room"):
+	def __init__(self, name=None, randoms={}, active=None):
+		self.name = name
+		self.rand_vals = randoms
+		self.active_room = active
 			
-			# since attempts or hints doesn't come with every room 
-			# first we have to sort which case it is
-			if r.find_all(attempts_exists) or r.hint:
-				if r['attempts'] and r.hint:
-					attempts = int(r['attempts'])
-					hint = r.hint.string
-				elif r['attemts']:
-					hint = 'not available'
-				else:
-					attempts = 1000
+	def __repr__(self):
+		return f'Game(name="{self.name}", randoms={self.rand_vals}, active={self.active_room})'
 
-			# now that we are clear on all properties we can build the room object
-			room = Room(name=r.title.string, description=r.description.string, attempts=attempts, hint=hint)
+	def upd_active_room(self, room=None):
+		self.active_room = room
 
-			# now we can add the paths to the rooms defined in the xml
-			for action in r.path.find_all("action"):
-				if 'randint' in action['input']:
-					random_value = eval(action['input'])
-					room.add_path({str(random_value): action.string})
-					self.rand_vals.update({room.name: random_value})
-				else:	
-					room.add_path({action['input']: action.string}) # self.rooms.get(action.string)
 
-			# finally, when rooms are complete we add them to the map with their id's
-			self.map.add_2_map({r['id']: room})		
-			
-		return self.map	
+	
+		# return self.map	
 		# for key, value in self.rooms.items():
 		# 	room = self.soup.find("room", id=key)
 
@@ -83,23 +59,62 @@ class Game():
 		# self.START = self.soup.game['start']
 		# self.active_room = self.load_room(self.soup.game['start'])
 	
-	def load_room(self, name):
-		return self.rooms.get(name)
+	# def load_room(self, name):
+	# 	return self.rooms.get(name)
 
-	def name_room(self, room):
-		for key, value in self.rooms.items():
-			if value == room:
-				return key
+	# def name_room(self, room):
+	# 	for key, value in self.rooms.items():
+	# 		if value == room:
+	# 			return key
 
 
 class Map():
 
 	def __init__(self):
-		self.map = {}
+		self.rooms = {}
 
 	def __repr__(self):
-		m = {x: repr(y) for x, y in self.map.items()}
+		m = {x: repr(y) for x, y in self.rooms.items()}
 		return f'{m}'
 
 	def add_2_map(self, item):
-		self.map.update(item)
+		self.rooms.update(item)
+
+
+def build_game(markup=None):
+	game = Game()
+	game_map = Map()
+
+	soup = BeautifulSoup(str(markup), 'lxml')
+	game.name = soup.game['id']
+	
+	for r in soup.find_all("room"):
+		
+		# since attempts or hints doesn't come with every room 
+		# first we have to sort which case it is
+		if r.find_all(attempts_exists) or r.hint:
+			if r['attempts'] and r.hint:
+				attempts = int(r['attempts'])
+				hint = r.hint.string
+			elif r['attemts']:
+				hint = 'not available'
+			else:
+				attempts = 1000
+
+		# now that we are clear on all properties we can build the room object
+		room = Room(name=r.title.string, description=r.description.string, attempts=attempts, hint=hint)
+
+		# now we can add the paths to the rooms defined in the xml
+		for action in r.path.find_all("action"):
+			if 'randint' in action['input']:
+				random_value = eval(action['input'])
+				room.add_path({str(random_value): action.string})
+				game.rand_vals.update({room.name: random_value})
+			else:	
+				room.add_path({action['input']: action.string}) # self.rooms.get(action.string)
+
+		# finally, when rooms are complete we add them to the map with their id's
+		game_map.add_2_map({r['id']: room})
+
+	game.active_room = game_map.rooms.get(soup.game['start'])
+	return game, game_map

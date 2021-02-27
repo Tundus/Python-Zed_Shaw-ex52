@@ -13,7 +13,7 @@
 <pre>
     {{ room.description }}
 </pre>
-{% if room.attempts < 100 and room.attempts > 1 %}
+{% if room.attempts < 100 and room.attempts > 0 %}
     <p>Number of attempts left: {{ room.attempts }}</p>
 {% endif %}
 

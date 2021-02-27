@@ -8,12 +8,12 @@
             <p>Hello {{user}}! Welcome back!</p>
             <label for="saved_games"> Please select a game to continue:</label>
             <select id="saved_games" name="saved_games">
-                {% for k,v in data.items() %}
-                    <option value="{{ k }}">{{k}} ({{v}})</option>
+                {% for name, data in games.items() %}
+                        <option value="{{ name }}">{{name}}: {{data.get('room')}}</option>
                 {% endfor %}
             </select>
             <br />
-            {% if 'Empty' in data.keys() %}
+            {% if 'Empty' in  games.keys() %}
                 <input type=submit value=Submit disabled>
             {% else %}
                 <input type=submit value=Submit>
