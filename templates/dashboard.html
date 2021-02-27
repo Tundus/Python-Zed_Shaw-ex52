@@ -3,25 +3,15 @@
 {% block content %}
 
     {% if user == "admin" %}
-        <p>Registered users and their saved game states:</p>
-        {% if user_prog %}
+        <p>Signed up users and their saved game data:</p>
+        {% if game_data %}
         <ul>
-            {% for user, game_state in user_prog.items() %}
-                <li><em>{{ user }}:</em> {{ game_state }}</li>
+            {% for user, game in game_data.items() %}
+               <li><em>{{ user }}:</em> {{ game }}</li>
             {% endfor %}
         </ul>
         {% endif %}
-        <br />
-        {% if game and randoms %}
-        <p>Active game: {{ game.name }}</p>
-        <p>Random values in active game:</p>
-        <ul>
-            {% for room, randval in randoms.items() %}
-                <li><em>{{ room }}:</em> {{ randval }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        <br />
+ 
         <a href="{{ url_for('del_user_dat') }}">Delete all user data</a>
         <br />
 

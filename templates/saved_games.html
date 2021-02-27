@@ -12,7 +12,7 @@
                         <option value="{{ name }}">{{name}}: {{data.get('room')}}</option>
                 {% endfor %}
             </select>
-            <br />
+           
             {% if 'Empty' in  games.keys() %}
                 <input type=submit value=Submit disabled>
             {% else %}

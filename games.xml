@@ -90,7 +90,7 @@
             <hint>20% is not a bad chance at all! Take lottery as an example! Not bad, innit?</hint>
         </room>
         <room attempts="1000" id='the_end_winner'>
-            <title>The End</title>
+            <title>The End. You Won!</title>
             <description>
                 You jump into your choosen pod and hit the eject button. The pod easily slides
                 out into space heading to the planet below. As it flies to the planet,
@@ -101,7 +101,7 @@
             <hint></hint>
         </room>
         <room attempts="1000" id='the_end_looser'>
-            <title>The End</title>
+            <title>The End. You Lost!</title>
             <description>
                 You jump into a random pod and hit the eject button. The pod escapes
                 out into the void of space, then implodes as the hull ruptures, 

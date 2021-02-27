@@ -79,7 +79,8 @@ def new_game():
 def saved_games():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
-	user_games = user_prog.get(user, 'Empty: Nothing saved yet!')
+	nothing_saved_yet = {'Empty': {'game': {Game(name='Nothing saved yet!', randoms='', active='')}, 'map': '', 'room': 'Nothing saved yet'}}
+	user_games = user_prog.get(user, nothing_saved_yet)
 	print ('user_games', user_games)
 	# user_game = eval(data.get('game'))
 	# with open('games.xml', 'r') as f:
@@ -188,8 +189,8 @@ def logon():
 @app.route("/logout")
 def logout():
 	session.pop('user', None)
-	session.pop('game_name', None)
-	session.pop('room_name', None)
+	session.pop('active_game', None)
+
 	return render_template("landing.html", user=None)
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -251,18 +252,17 @@ def del_user_dat():
 def dashboard():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
-	active_game = eval(session.get('active_game'))
-	active_room = eval(session.get('active_room'))
+	game_data = dict()
+	
+	for usr, data in user_prog.items():
+		for game, details in data.items():
+			game = eval(details.get('game'))
+			game_data[usr] = [game.name, game.rand_vals, game.active_room.name]
 
-	if active_game:
-		randoms = active_game.rand_vals
-
-	else:
-		randoms = None
+	# print ('user data', user_data)
 
 	if request.method == 'GET' and user == 'admin':
-		return render_template('dashboard.html', user=user, user_prog=user_prog,\
-								 game=active_game, randoms=randoms, room=active_room)
+		return render_template('dashboard.html', user=user, game_data=game_data)
 
 	else:
 		pass			
