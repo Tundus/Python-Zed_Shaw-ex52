@@ -81,29 +81,19 @@ def saved_games():
 	user_prog = unpickle_it('user_prog.pickle')
 	nothing_saved_yet = {'Empty': {'game': {Game(name='Nothing saved yet!', randoms='', active='')}, 'map': '', 'room': 'Nothing saved yet'}}
 	user_games = user_prog.get(user, nothing_saved_yet)
-	print ('user_games', user_games)
-	# user_game = eval(data.get('game'))
-	# with open('games.xml', 'r') as f:
-	# 	soup = set_soup(f)
+
 
 	if request.method == 'GET':
 		return render_template("saved_games.html", user=user, games=user_games)
 
 	else:
 		game_name = request.form['saved_games']
-		# game_markup = soup.find('game', id=game_name)
-		# active_game = planisphere.Game(game_markup)
 		load_game_data = user_games.get(game_name)
 
 		session['active_game'] = load_game_data.get('game')
 		session['map'] = load_game_data.get('map')
 
-		# session['game_name'] = game_name
-		# session['room_name'] = room_name
-
 		return redirect(url_for("game"))
-
-	# return render_template("show_room.html", room=active_room, user=user)
 
 @app.route("/game", methods=['GET', 'POST'])
 def game():
@@ -128,14 +118,9 @@ def game():
 			next_room = room.go(action)
 
 			if not next_room:
-				room.attempts -= 1
-				# session['active_game'] = repr(active_game)
-					
+				room.attempts -= 1					
 
 				if room.attempts == 0:
-				# 	return render_template("show_room.html", room=room, user=user)
-
-				# else:
 					return render_template("you_died.html", room=room, user=user)
 
 			else:
@@ -151,8 +136,6 @@ def game():
 			
 			session['active_game'] = repr(active_game)
 				
-
-
 				
 		else:
 			return render_template("you_died.html")
@@ -179,10 +162,6 @@ def logon():
 
 		else:
 			error = 'Invalid credentials!'
-
-			#return render_template("saved_games.html", data=data, user=user)
-			#flash('Success! Your previously saved progress was loaded in! You can carry-on!')
-			#return redirect(url_for('game'))
 	
 	return render_template('logon.html', error=error)
 
@@ -259,7 +238,6 @@ def dashboard():
 			game = eval(details.get('game'))
 			game_data[usr] = [game.name, game.rand_vals, game.active_room.name]
 
-	# print ('user data', user_data)
 
 	if request.method == 'GET' and user == 'admin':
 		return render_template('dashboard.html', user=user, game_data=game_data)

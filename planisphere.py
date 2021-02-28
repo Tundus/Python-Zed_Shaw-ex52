@@ -15,13 +15,10 @@ class Room():
 		self.attempts = int(attempts)
 		self.hint = hint
 		self.paths.update(paths)
-		
-
 
 	def __repr__(self):
 		return f'Room(name="{self.name}", description="""{self.description}""", attempts="{self.attempts}", hint="{self.hint}", paths={self.paths})'
-
-		
+	
 	def go(self, direction):
 		return self.paths.get(direction, None)
 
@@ -41,31 +38,6 @@ class Game():
 
 	def upd_active_room(self, room=None):
 		self.active_room = room
-
-
-	
-		# return self.map	
-		# for key, value in self.rooms.items():
-		# 	room = self.soup.find("room", id=key)
-
-		# 	for action in room.path.find_all("action"):
-		# 		if 'randint' in action['input']:
-		# 			random_value = eval(action['input'])
-		# 			value.add_path({str(random_value): action.string})
-		# 			self.rand_vals.update({value.name: random_value})
-		# 		else:	
-		# 			value.add_path({action['input']: action.string}) # self.rooms.get(action.string)
-		
-		# self.START = self.soup.game['start']
-		# self.active_room = self.load_room(self.soup.game['start'])
-	
-	# def load_room(self, name):
-	# 	return self.rooms.get(name)
-
-	# def name_room(self, room):
-	# 	for key, value in self.rooms.items():
-	# 		if value == room:
-	# 			return key
 
 
 class Map():
