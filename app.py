@@ -99,7 +99,6 @@ def saved_games():
 def game():
 	user = session.get('user')
 	active_game = eval(session.get('active_game'))
-	print ('active game type', type(active_game))
 	game_map = eval(session.get('map'))
 	room = active_game.active_room
 
@@ -120,8 +119,15 @@ def game():
 			if not next_room:
 				room.attempts -= 1					
 
-				if room.attempts == 0:
+				hidden_room = room.go('yoyorabbit')
+				if room.attempts == 0 and not hidden_room:
 					return render_template("you_died.html", room=room, user=user)
+
+				elif room.attempts == 0 and hidden_room: # yoyorabbit works as 'finally' in a try construct
+					room = eval(game_map.get(hidden_room))
+
+				else:
+					pass
 
 			else:
 				room = eval(game_map.get(next_room))
@@ -131,7 +137,13 @@ def game():
 
 			if not room.name in ['death', 'The End'] and user:
 				user_prog = unpickle_it('user_prog.pickle')
-				user_prog[user] = {active_game.name: {'game': repr(active_game), 'map': repr(game_map), 'room': room.name}}
+
+				try:
+					user_prog[user].update({active_game.name: {'game': repr(active_game), 'map': repr(game_map), 'room': room.name}})
+				
+				except KeyError:
+					user_prog[user] = {active_game.name: {'game': repr(active_game), 'map': repr(game_map), 'room': room.name}}
+				
 				pickle_it(user_prog, 'user_prog.pickle')
 			
 			session['active_game'] = repr(active_game)
@@ -158,7 +170,12 @@ def logon():
 			session['user'] = user
 
 			flash('Your are signed in as {}!'.format(user))
-			return render_template("landing.html", user=user)
+
+			if session.get('active_game'):
+				return redirect(url_for("game"))
+			
+			else:
+				return redirect(url_for("saved_games"))
 
 		else:
 			error = 'Invalid credentials!'
@@ -181,8 +198,9 @@ def register():
 		pwd_blank = hashlib.sha256(''.encode('utf-8')).hexdigest()
 
 		regusr = request.form['regusername']
-		game_name = session.get('game_name', None)
-		room_name = session.get('room_name', None)
+		active_game = eval(session.get('active_game'))
+		game_map = eval(session.get('map'))
+		room = active_game.active_room	
 		user_adat = unpickle_it('user_adat.pickle')
 		
 		if not regusr in user_adat and regusr and len(regusr)>1 and regusr != 'admin':
@@ -191,22 +209,26 @@ def register():
 				pickle_it(user_adat, 'user_adat.pickle')
 				
 				
-				if game_name:
+				if active_game:
 					user_prog = unpickle_it('user_prog.pickle')
-					user_prog[regusr] = {game_name:room_name}
+					user_prog[regusr] = {active_game.name: {'game': repr(active_game), 'map': repr(game_map), 'room': room.name}}			
 					pickle_it(user_prog, 'user_prog.pickle')
 
 
-				session['user'] = regusr
-				flash('Your user was registered!')
-				return render_template('landing.html', user=regusr)
+					session['user'] = regusr
+					flash('Your user was registered!')
+					return redirect(url_for("game"))
+					
+				else:
+					return redirect(url_for("saved_games"))
 
 			else:
 				error = 'Your passwords must match and can\'t be blank!'
 		
 		else:
 			error = 'Choose a different, min 2 char long user name!'
-			return render_template('logon.html', error=error)
+		
+		return render_template('logon.html', error=error)
 
 	else:
 		return render_template('logon.html', error=error)
@@ -235,8 +257,14 @@ def dashboard():
 	
 	for usr, data in user_prog.items():
 		for game, details in data.items():
+
 			game = eval(details.get('game'))
-			game_data[usr] = [game.name, game.rand_vals, game.active_room.name]
+			try:
+				game_data[usr].update({game.name: [game.rand_vals, game.active_room.name]})
+			
+			except KeyError:
+				game_data[usr] = {game.name: [game.rand_vals, game.active_room.name]}
+	
 
 
 	if request.method == 'GET' and user == 'admin':

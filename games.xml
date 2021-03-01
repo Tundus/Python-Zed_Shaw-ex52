@@ -86,10 +86,11 @@
             <path>
                 <action input="randint(1,5)">the_end_winner</action>
                 <action input="9">the_end_winner</action>
+                <action input="yoyorabbit">the_end_looser</action>
             </path>
-            <hint>20% is not a bad chance at all! Take lottery as an example! Not bad, innit?</hint>
+            <hint>20% is not a bad chance at all! I know a life or death lottery is not a comforting thought!</hint>
         </room>
-        <room attempts="1000" id='the_end_winner'>
+         <room attempts="1000" id='the_end_winner'>
             <title>The End. You Won!</title>
             <description>
                 You jump into your choosen pod and hit the eject button. The pod easily slides
@@ -119,10 +120,43 @@
             <hint></hint>
         </room>
     </game>
-    <game id="New1" start="central_corridor">
-        <description>Original game with a twist. Not yet implemented.</description>
+    <game id="Zed_web_gothon_mod_1" start="square_one">
+        <description>Original game with a twist. Kept short and sweet.</description>
+        <room attempts="3" id='square_one'>
+            <title>This is where the adventure starts!</title>
+            <description>
+                This should be an easy warm up for you!
+                Complete this to reveal my secret:
+                Marco ....
+            </description>
+            <path>
+                <action input="Polo">the_end</action>
+            </path>
+            <hint>Great adventurer from Venice. Lived in the 13th century.</hint>
+        </room>
+        <room attempts="1" id='the_end'>
+            <title>You are almost there!</title>
+            <description>
+                Maybe I wasn't completely honest with you about this story
+                being sweet but short it is! So, lets' make it up! 
+                Here is a bonus question for you! In which century Marco lived?
+
+            </description>
+            <path>
+                <action input="13">generic_death</action>
+            </path>
+            <hint>Don't believe in tales!</hint>
+        </room>
+        <room attempts="1000" id='generic_death'>
+            <title>death</title>
+            <description>
+                You died.
+            </description>
+            <path></path>
+            <hint></hint>
+        </room>
     </game>
-    <game id="New2">
+    <game id="Zed_web_gothon_mod_2">
         <description>A brand new game. Not yet implemented.</description>
     </game>
 </data>
