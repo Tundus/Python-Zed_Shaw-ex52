@@ -198,9 +198,9 @@ def register():
 		pwd_blank = hashlib.sha256(''.encode('utf-8')).hexdigest()
 
 		regusr = request.form['regusername']
-		active_game = eval(session.get('active_game'))
-		game_map = eval(session.get('map'))
-		room = active_game.active_room	
+		active_game = session.get('active_game', None)
+	
+		
 		user_adat = unpickle_it('user_adat.pickle')
 		
 		if not regusr in user_adat and regusr and len(regusr)>1 and regusr != 'admin':
@@ -208,14 +208,15 @@ def register():
 				user_adat[regusr] = pwd1
 				pickle_it(user_adat, 'user_adat.pickle')
 				
-				
+				session['user'] = regusr
 				if active_game:
+					active_game = eval(session.get('active_game'))
+					game_map = eval(session.get('map'))
+					room = active_game.active_room	
 					user_prog = unpickle_it('user_prog.pickle')
 					user_prog[regusr] = {active_game.name: {'game': repr(active_game), 'map': repr(game_map), 'room': room.name}}			
 					pickle_it(user_prog, 'user_prog.pickle')
 
-
-					session['user'] = regusr
 					flash('Your user was registered!')
 					return redirect(url_for("game"))
 					
