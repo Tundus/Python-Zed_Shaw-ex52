@@ -254,22 +254,23 @@ def del_user_dat():
 def dashboard():
 	user = session.get('user')
 	user_prog = unpickle_it('user_prog.pickle')
-	game_data = dict()
+	usr_games = dict()
 	
 	for usr, data in user_prog.items():
 		for game, details in data.items():
 
 			game = eval(details.get('game'))
+			gmap = eval(details.get('map'))
 			try:
-				game_data[usr].update({game.name: [game.rand_vals, game.active_room.name]})
+				usr_games[usr].update({game.name: [game.rand_vals, game.active_room.name, len(gmap)]})
 			
 			except KeyError:
-				game_data[usr] = {game.name: [game.rand_vals, game.active_room.name]}
+				usr_games[usr] = {game.name: [game.rand_vals, game.active_room.name, len(gmap)]}
 	
 
 
 	if request.method == 'GET' and user == 'admin':
-		return render_template('dashboard.html', user=user, game_data=game_data)
+		return render_template('dashboard.html', user=user, usr_games=usr_games)
 
 	else:
 		pass			

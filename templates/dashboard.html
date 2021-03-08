@@ -4,10 +4,19 @@
 
     {% if user == "admin" %}
         <p>Signed up users and their saved game data:</p>
-        {% if game_data %}
+        {% if usr_games %}
         <ul>
-            {% for user, game in game_data.items() %}
-               <li><em>{{ user }}:</em> {{ game }}</li>
+            {% for user, game in usr_games.items() %}
+               <li style="list-style-type:square"><em>{{ user }}:</em>
+                    <ul>
+                    {% for key, values in game.items() %}<br />
+                        <li>Game name: {{ key }}</li>
+                        <li>Random values for the game: {{ values[0] }}</li>
+                        <li>Actual room: {{ values[1] }}</li>
+                        <li>Number of rooms in map: {{ values[2] }}</li>
+                    {% endfor %}
+                    </ul>
+                </li>              
             {% endfor %}
         </ul>
         {% endif %}

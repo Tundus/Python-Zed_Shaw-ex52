@@ -49,6 +49,9 @@ class Map():
 		m = {x: repr(y) for x, y in self.rooms.items()}
 		return f'{m}'
 
+	def __len__(self):
+		return len(self.rooms)
+
 	def add_2_map(self, item):
 		self.rooms.update(item)
 

@@ -7,7 +7,7 @@ This exercise will be huge, and I can predict you could spend anywhere from a we
 
 Well, several months and a few more grey hair later my solution is up and running. It could be tested on heroku: the-gothon-game.herokuapp.com
 
-If I had to nominate one main achievement that makes me smug about this project server side session handling would be my straight choice. Boy, that gave me a lot of grief. However, it's been a great teacher too. The good news is that it works! Not by accident, I eked it out, so you don't have to!
+Server side session handling makes me smug about this project if I can be honest with you. It gave me a lot of grief and eventually a lot of happy moments too. When it started to work. For that I had to introduce magic methods for Game, Room and Map. It was a heureka moment. For these moments it is worth doing this.
 
 Caveats:
 If you put it on the web change the password in my dotenv file. This file is only there for demonstration and local testing. My heroku app has a different password. The dotenv file is created to support development on a local machine. I enclosed it here to 'play with cards down on the table'. 
